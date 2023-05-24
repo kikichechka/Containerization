@@ -1,0 +1,117 @@
+Дз
+sudo unshare --net bash = пространство имен становится постоянным, создается привязка монтирования в файл
+
+sudo unshare --pid bash = создание нового пространство имен PID. Если файл указан, то пространство имен становится постоянным, создавая привязку монтирования в файл. Создание постоянного пространства имен PID завершится ошибкой, так как опция --fork не указана.
+
+sudo unshare --pid --fork bash = создание нового пространство имен PID. Если файл указан, то пространство имен становится постоянным, создавая привязку монтирования в файл. 
+
+sudo unshare --fork bash = разветвление указанной программы как дочерний процесс unshare. Это удобно при создании нового пространства имен PID.
+
+exit
+free -m
+exit
+
+Семинар
+---------------------
+Mkdir – создание новой директории
+Ls – посмотреть файлы и папки в текущей директории
+Cd – сменить директорию
+Cp file1 file2 – скопировать file1 как file2
+Ldd – список зависимостей
+Chroot – смена корня
+Ip netns list – посмотреть сетевые пространства имён
+Ip  netns add namespace_name – создать сетевое пространство имён
+Ip netns exec namespace_name bash – запустить командную оболочку с  изоляцией сетевых интерфейсов
+
+
+Ip link set dev lo up – поднять сетевой интерфейс
+Unshare [--pid|--net|--fork|--mount-proc] /bin/bash – изоляция процесса
+
+Меняем корень на ново созданную папку, сменим корень на другую папку. Команда ls должна быть рабочей.
+mkdir newroot новая папка
+cd newroot
+mkdir bin
+mkdir lib
+mkdir lib64
+rmdir sys
+cp /bin/bash bin
+cp /bin/ls bin
+ldd bin/bash
+cp /lib/x86_64-linux-gnu/libtinfo.so.6 lib/
+cp /lib/x86_64-linux-gnu/libc.so.6 lib/
+cp /lib64/ld-linux-x86-64.so.2 lib64
+cd ..
+sudo chroot newroot сменили корень
+exit
+ldd /bin/ls
+cp /lib64/ld-linux-x86-64.so.2 newroot/lib
+cd newroot/bin
+ls
+cd ..
+ls lib
+sudo chroot ../newroot
+mkdir test
+cd test
+
+запустить баш с изоляцией сетевых интерфейсов
+rm  -f -r testfolder/
+ip netns list
+sudo ip netns add newnetns
+sudo ip netns exec newnetns bash
+exit
+ip a просмотр интерфейсов
+ping localhost
+sudo ip netns exec newnetns bash
+ip a
+ping localhost
+ip link set dev lo up
+ip a
+exit
+ip a
+
+
+
+sudo ip link add veth0 type veth peer name veth1
+
+sudo ip link set veth1 netns newnetns
+sudo ip addr add 192.168.1.134/24 dev veth0
+sudo ip link set dev veth0 up
+ip a
+
+ip netns list
+sudo ip netns exec newnetns bash
+sudo ip addr add 192.168.1.143 dev veth1
+ip link set dev veth1 up
+exit
+ping 192.168.1.143
+
+
+ip link set dev veth0 up
+ip link set veth1 netns newnetns
+ip addr add 192.168.1.134/24 dev veth0
+ip addr add 192.168.1.143/24 dev veth1
+ip link set dev veth1 up
+ping 192.168.1.143
+
+
+изолировать процесс по сети
+изолировать процесс
+sudo unshare --net bash 
+exit
+free -m
+sudo unshare --net --pid --fork bash
+exit
+
+
+
+
+
+
+
+
+
+
+
+
+
+
