@@ -30,6 +30,3 @@ lxc-start -n test
 lxc-ls -f
 exit
 cat /logfile.log
-
-
-
