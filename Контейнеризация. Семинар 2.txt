@@ -1,0 +1,35 @@
+1) запустить контейнер с ubuntu, используя механизм LXC
+2) ограничить контейнер 256 Мб ОЗУ и проверить, что ограничение работает
+3) добавить автозапуск контейнеру, перезагрузить ОС и убедиться, что контейнер действительно запустился самостоятельно
+4) при создании указать файл, куда записывать логи
+5) после перезагрузки проанализировать логи
+
+apt install lxd-installer
+lxd init
+apt install lxc-utils
+lxc-create -n test -t ubuntu
+lxc-ls
+lxc-ls -f
+lxc-start -n test --logfile /logfile.log -l debug
+lxc-ls -f
+
+
+lxc-attach -n test
+hostname
+free -m
+exit
+lxc-stop -n test
+lxc-ls -f
+cd /var/lib/lxc/test/config
+nano config
+lxc.cgroup2.memory.max = 256M
+lxc.start.auto  =  1
+lxc.net.0.ipv4.address = 105.122.10.10/24
+cd ~/
+lxc-start -n test
+lxc-ls -f
+exit
+cat /logfile.log
+
+
+
